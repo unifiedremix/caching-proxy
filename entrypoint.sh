@@ -1,30 +1,30 @@
 #!/bin/sh
 
 # set env vars or defaults
-if [ ! $LOG_LEVEL ]
+if [ -z "$LOG_LEVEL" ]
   then
   export LOG_LEVEL=warn
 fi
 
-if [ ! $LOG_FORMAT ]
+if [ -z "$LOG_FORMAT" ]
   then
   export LOG_FORMAT="%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" \"%{cache-status}e\" \"%{REMIX_REQUEST_ID}i\" %D"
 fi
 
 # validate required variables are set
-if [ ! $NAME ]
+if [ -z "$NAME" ]
   then
   echo >&2 "Error: NAME environment variable is required but not set."
   exit 1
 fi
 
-if [ ! $TARGET ]
+if [ -z "$TARGET" ]
   then
   echo >&2 "Error: TARGET environment variable is required but not set."
   exit 1
 fi
 
-if [ ! $CACHE_MAX_FILESIZE ]
+if [ -z "$CACHE_MAX_FILESIZE" ]
   then
   echo >&2 "Error: CACHE_MAX_FILESIZE environment variable is required but not set."
   exit 1
