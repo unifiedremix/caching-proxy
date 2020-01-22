@@ -1,18 +1,12 @@
-FROM alpine:3.4
+FROM nginx:1.13.7-alpine
 
-# install
-RUN apk --update add apache2 \
-                     apache2-proxy \
- && rm -f /var/cache/apk/* 
+# install nginx
+# RUN apk --update add nginx \
+#  && rm -f /var/cache/apk/* \
+#  && mkdir -p /run/nginx \
+#  && mkdir -p /var/cache/nginx/ 
 
-# configure
-RUN mkdir -p /run/apache2 \
- && mkdir -p /var/cache/apache2/mod_cache_disk \
- && chown apache:apache /var/cache/apache2/mod_cache_disk \
- && ln -s /dev/stderr /var/log/apache2/error.log \
- && ln -s /dev/stdout /var/log/apache2/access.log
-
-COPY proxy.conf.in /etc/apache2/conf.d/proxy.conf.in
+COPY nginx.conf.in /etc/nginx/nginx.conf.in
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
@@ -21,4 +15,4 @@ EXPOSE 80
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
-CMD ["-D", "FOREGROUND"]
+CMD ["-g", "daemon off;"]

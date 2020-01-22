@@ -1,0 +1,43 @@
+worker_processes 1;
+
+error_log /dev/stderr {{LOG_LEVEL}};
+
+events {
+  worker_connections 1024;
+}
+
+http {
+  include mime.types;
+  default_type application/octet-stream;
+  sendfile on;
+  keepalive_timeout 65;
+  client_max_body_size 0;
+  large_client_header_buffers 4 32k;
+
+  log_format cache_log '{{LOG_FORMAT}}';
+
+  proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=small:100m inactive=10m use_temp_path=off;
+  
+  server {
+    listen 80;
+    server_name {{NAME}};
+
+    access_log /dev/stdout cache_log;
+
+    location / {
+      slice 1m;
+      proxy_pass http://{{TARGET}};
+      proxy_cache small;
+      proxy_cache_methods GET HEAD POST;
+      proxy_cache_key "{{CACHE_KEY}}";
+      proxy_cache_use_stale updating;
+      proxy_cache_lock on;
+      proxy_cache_valid 200 206 1h;
+      proxy_set_header Range $slice_range;
+      proxy_buffers 8 32k;
+      proxy_buffer_size 32k;
+      add_header X-Cached $upstream_cache_status;
+    }
+  }
+
+}
